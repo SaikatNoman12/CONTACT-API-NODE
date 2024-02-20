@@ -1,5 +1,5 @@
 import express from "express";
-import { createContact, deleteContact, getAllContacts, updateContact } from "../controllers/contactControllers.js";
+import { createContact, deleteContact, getAllContacts, getSingleContact, updateContact } from "../controllers/contactControllers.js";
  
 // constant variable
 const router = express.Router();
@@ -19,6 +19,6 @@ const router = express.Router();
 */
 router.route("/").get(getAllContacts).post(createContact);
 
-router.route("/:id").get(getAllContacts).put(updateContact).delete(deleteContact);
+router.route("/:id").get(getSingleContact).put(updateContact).delete(deleteContact);
 
 export default router;
