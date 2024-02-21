@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import asyncHandler from 'express-async-handler';
+import jwt from "jsonwebtoken";
 import User from '../models/userModel.js';
-
 
 /**
  * @des `register user`
@@ -14,32 +14,32 @@ const registerUser = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("All fields are mandatory!");
     }
-    else{
+    else {
         const userAvailable = await User.findOne({ email });
         if (userAvailable) {
             res.status(400);
             throw new Error("User already registered");
         }
-        else{
+        else {
             // Hashed Password
             const hashedPassword = await bcrypt.hash(password, 10);
             const createNewUser = await User.create({
                 username,
                 email,
-                password:hashedPassword
+                password: hashedPassword
             });
-            if(createNewUser){
+            if (createNewUser) {
                 res.status(201).json({
-                    _id:createNewUser.id, 
-                    email:createNewUser.email
+                    _id: createNewUser.id,
+                    email: createNewUser.email
                 });
             }
-            else{
+            else {
                 res.status(400);
                 throw new Error("user data is not valid!");
             }
-            res.status(200).json({msg:"Register new user!"});
-            
+            res.status(200).json({ msg: "Register new user!" });
+
         }
 
     }
@@ -52,7 +52,30 @@ const registerUser = asyncHandler(async (req, res) => {
  * @access `public`
 */
 const loginUser = asyncHandler(async (req, res) => {
-    res.status(200).json({ msg: 'Login Api Working!' });
+    const { email, password } = req.body;
+    if (!email || !password) {
+        throw new Error("All fields are mandatory!");
+    }
+    const user = await User.findOne({ email });
+    if (user && (await bcrypt.compare(password, user.password))) {
+        const accessToken = jwt.sign({
+            user: {
+                username: user.username,
+                email: user.email,
+                id: user.id,
+            },
+        },
+            process.env.ACCESS_TOKEN_SECRET,
+            {
+                expiresIn: "1min"
+            }
+        );
+        res.status(200).json({ accessToken });
+    }
+    else{
+        res.status(401);
+        throw new Error("Email or Password nor valid!");
+    }
 });
 
 /**
