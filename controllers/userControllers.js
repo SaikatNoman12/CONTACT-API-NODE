@@ -67,7 +67,7 @@ const loginUser = asyncHandler(async (req, res) => {
         },
             process.env.ACCESS_TOKEN_SECRET,
             {
-                expiresIn: "1min"
+                expiresIn: "15min"
             }
         );
         res.status(200).json({ accessToken });
@@ -81,10 +81,10 @@ const loginUser = asyncHandler(async (req, res) => {
 /**
  * @des `current user`
  * @route `current API api/users/current`
- * @access `public`
+ * @access `private`
 */
 const currentUser = asyncHandler(async (req, res) => {
-    res.status(200).json({ msg: 'Current Api Working!' });
+    res.status(200).json(req.user);
 });
 
 export { currentUser, loginUser, registerUser };

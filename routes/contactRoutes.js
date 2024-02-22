@@ -1,5 +1,6 @@
 import express from "express";
 import { createContact, deleteContact, getAllContacts, getSingleContact, updateContact } from "../controllers/contactControllers.js";
+import validateToken from "../middleware/validateTokenHandler.js";
  
 // constant variable
 const router = express.Router();
@@ -17,6 +18,7 @@ const router = express.Router();
  * @get & @post method
  * @put & @delete method
 */
+router.use(validateToken)
 router.route("/").get(getAllContacts).post(createContact);
 
 router.route("/:id").get(getSingleContact).put(updateContact).delete(deleteContact);
